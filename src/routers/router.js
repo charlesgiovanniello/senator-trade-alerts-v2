@@ -14,7 +14,6 @@ router.post('/addFiling', async (req,res) =>{
 
 router.get('/getFilingByUrl', async (req,res)=>{
     const url = req.query
-    //console.log(url)
     const filing = await Url.find(url)
     if(filing.length > 0){
         res.status(200).send(filing)

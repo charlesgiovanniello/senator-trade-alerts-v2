@@ -20,22 +20,23 @@ const baseUrl = "https://disclosures-clerk.house.gov"
 const addAllItems = async() => {
   getFilings().then(async(res) => {
     for(let i=0;i<res.length;i++){
-      await axios.post(`http://[::1]:${process.env.PORT}/addFiling?url=${res[i]}`)
+      await axios.post(`http://localhost:${process.env.PORT}/addFiling?url=${res[i]}`)
     } 
   })
 }
+
 
 const findNewItems = () =>{
   getFilings().then(async(res)=>{
     for(let i =0;i<res.length;i++)
       try{
-        await axios.get(`http://[::1]:${process.env.PORT}/getFilingByUrl?url=${res[i]}`)
+        await axios.get(`http://localhost:${process.env.PORT}/getFilingByUrl?url=${res[i]}`)
         .then(res => {
           //console.log(res.status)
         }).catch(async error => {
           if(error.response.status === 404){
             handleNewItem(baseUrl+res[i])
-            await axios.post(`http://[::1]:${process.env.PORT}/addFiling?url=${res[i]}`)
+            await axios.post(`http://localhost:${process.env.PORT}/addFiling?url=${res[i]}`)
           }
           else{
             console.log(error.response.status)
@@ -57,6 +58,12 @@ const handleNewItem = async (link) => {
     console.log(tweet)
   }
 }
+
+// async function main() {
+//   await axios.get(`http://localhost:${process.env.PORT}/getFilingByUrl?url=/public_disc/ptr-pdfs/2022/20021323.pdf`)
+// }
+
+// main()
 
 findNewItems()
 
