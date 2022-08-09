@@ -10,7 +10,7 @@ const hasStockReport = () =>{
             if(data.text.includes('[ST]')){
                 resolve(true)
             }
-            reject(false)
+            resolve(false)
         });
     })
 }
@@ -19,8 +19,13 @@ const getFilerName = () =>{
         let dataBuffer = fs.readFileSync('./download/disclosures/disclosure.pdf');
         pdf(dataBuffer).then(function(data) {
             //console.log(data.text)
-            const filerName = (data.text.match(/(?<=name:|Name:).*(?=\n)/gm)[0]).replace("Hon","").replace(".","").replace(" ","")
-            resolve(filerName)
+            try{
+                const filerName = (data.text.match(/(?<=name:|Name:).*(?=\n)/gm)[0]).replace("Hon","").replace(".","").replace(" ","")
+                resolve(filerName)
+            }catch(e){
+                console.log(data.text)
+                resolve('Senator')
+            }
         });
     })
 }
