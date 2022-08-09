@@ -20,7 +20,7 @@ const baseUrl = "https://disclosures-clerk.house.gov"
 const addAllItems = async() => {
   getFilings().then(async(res) => {
     for(let i=0;i<res.length;i++){
-      await axios.post(`http://[::1]:3000/addFiling?url=${res[i]}`)
+      await axios.post(`http://[::1]:${process.env.PORT}/addFiling?url=${res[i]}`)
     } 
   })
 }
@@ -28,13 +28,13 @@ const addAllItems = async() => {
 const findNewItems = () =>{
   getFilings().then(async(res)=>{
     for(let i =0;i<res.length;i++)
-      await axios.get(`http://[::1]:3000/getFilingByUrl?url=${res[i]}`)
+      await axios.get(`http://[::1]:${process.env.PORT}/getFilingByUrl?url=${res[i]}`)
       .then(res => {
         //console.log(res.status)
       }).catch(async error => {
         if(error.response.status === 404){
           handleNewItem(baseUrl+res[i])
-          await axios.post(`http://[::1]:3000/addFiling?url=${res[i]}`)
+          await axios.post(`http://[::1]:${process.env.PORT}/addFiling?url=${res[i]}`)
         }
         else{
           console.log(error.response.status)
@@ -49,7 +49,7 @@ const handleNewItem = async (link) => {
   if(await hasStockReport()){
     let tweet = `${filerName} has filed a new stock trade \n\nSource: ${link} \n\n#${filerName.replaceAll(' ','')} #stocks #trading`
     await convertPDFtoPNG() //converts the most recent report to an image to be uploaded by twitter
-    //sendTweet(tweet)
+    sendTweet(tweet)
     console.log(tweet)
   }
 }
@@ -61,5 +61,3 @@ cron.schedule('*/10 * * * *', () => {
 }, {
   scheduled: true,
 });
-
-
