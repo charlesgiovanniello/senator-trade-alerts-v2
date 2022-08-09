@@ -17,6 +17,12 @@ module.exports = app
 
 const baseUrl = "https://disclosures-clerk.house.gov"
 
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 const addAllItems = async() => {
   getFilings().then(async(res) => {
     for(let i=0;i<res.length;i++){
@@ -28,14 +34,14 @@ const addAllItems = async() => {
 
 const findNewItems = () =>{
   getFilings().then(async(res)=>{
-    for(let i =0;i<res.length;i++)
+    for(let i =0;i<res.length;i++){
       try{
         await axios.get(`http://localhost:${process.env.PORT}/getFilingByUrl?url=${res[i]}`)
         .then(res => {
           //console.log(res.status)
         }).catch(async error => {
           if(error.response.status === 404){
-            handleNewItem(baseUrl+res[i])
+            await handleNewItem(baseUrl+res[i])
             await axios.post(`http://localhost:${process.env.PORT}/addFiling?url=${res[i]}`)
           }
           else{
@@ -45,18 +51,25 @@ const findNewItems = () =>{
       }catch(e){
         console.log(e)
       }
+      //await sleep(500)
+    }
   })
 }
+
 //Gets called if 404 response from local database (Item doesnt exist yet)
-const handleNewItem = async (link) => {
-  await downloadDisclosures(link)
-  const filerName = await getFilerName()
-  if(await hasStockReport()){
-    let tweet = `${filerName} has filed a new stock trade \n\nSource: ${link} \n\n#${filerName.replaceAll(' ','')} #stocks #trading`
-    await convertPDFtoPNG() //converts the most recent report to an image to be uploaded by twitter
-    //sendTweet(tweet)
-    console.log(tweet)
-  }
+const handleNewItem = (link) => {
+  return new Promise(async(resolve)=>{
+    await downloadDisclosures(link)
+    const filerName = await getFilerName()
+    if(await hasStockReport()){
+      let tweet = `${filerName} has filed a new stock trade \n\nSource: ${link} \n\n#${filerName.replaceAll(' ','').replace(".","")} #stocks #trading`
+      await convertPDFtoPNG() //converts the most recent report to an image to be uploaded by twitter
+      sendTweet(tweet)
+      console.log(tweet)
+      resolve()
+    }
+    resolve()
+  })
 }
 
 // async function main() {
@@ -64,10 +77,9 @@ const handleNewItem = async (link) => {
 // }
 
 // main()
+//findNewItems()
 
-findNewItems()
-
-cron.schedule('*/10 * * * *', () => {
+cron.schedule('02 09 * * 1-5', () => {
   findNewItems()
 }, {
   scheduled: true,
