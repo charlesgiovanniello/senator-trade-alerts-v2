@@ -49,7 +49,7 @@ const handleNewItem = async (link) => {
   if(await hasStockReport()){
     let tweet = `${filerName} has filed a new stock trade \n\nSource: ${link} \n\n#${filerName.replaceAll(' ','')} #stocks #trading`
     await convertPDFtoPNG() //converts the most recent report to an image to be uploaded by twitter
-    sendTweet(tweet)
+    //sendTweet(tweet)
     console.log(tweet)
   }
 }
