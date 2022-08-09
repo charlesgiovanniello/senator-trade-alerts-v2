@@ -28,18 +28,22 @@ const addAllItems = async() => {
 const findNewItems = () =>{
   getFilings().then(async(res)=>{
     for(let i =0;i<res.length;i++)
-      await axios.get(`http://[::1]:${process.env.PORT}/getFilingByUrl?url=${res[i]}`)
-      .then(res => {
-        //console.log(res.status)
-      }).catch(async error => {
-        if(error.response.status === 404){
-          handleNewItem(baseUrl+res[i])
-          await axios.post(`http://[::1]:${process.env.PORT}/addFiling?url=${res[i]}`)
-        }
-        else{
-          console.log(error.response.status)
-        }
-      })
+      try{
+        await axios.get(`http://[::1]:${process.env.PORT}/getFilingByUrl?url=${res[i]}`)
+        .then(res => {
+          //console.log(res.status)
+        }).catch(async error => {
+          if(error.response.status === 404){
+            handleNewItem(baseUrl+res[i])
+            await axios.post(`http://[::1]:${process.env.PORT}/addFiling?url=${res[i]}`)
+          }
+          else{
+            console.log(error.response.status)
+          }
+        })
+      }catch(e){
+        console.log(e)
+      }
   })
 }
 //Gets called if 404 response from local database (Item doesnt exist yet)
