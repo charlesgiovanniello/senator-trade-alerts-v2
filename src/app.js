@@ -62,9 +62,9 @@ const handleNewItem = (link) => {
     await downloadDisclosures(link)
     const filerName = await getFilerName()
     if(await hasStockReport()){
-      let tweet = `${filerName} has filed a new stock trade \n\nSource: ${link} \n\n#${filerName.replaceAll(' ','').replace(".","")} #stocks #trading`
+      let tweet = `Senator ${filerName} has filed a new stock trade \n\nSource: ${link} \n\n#${filerName.replaceAll(' ','').replace(".","")} #stocks #trading`
       await convertPDFtoPNG() //converts the most recent report to an image to be uploaded by twitter
-      sendTweet(tweet)
+      //sendTweet(tweet)
       console.log(tweet)
       resolve()
     }
@@ -77,7 +77,7 @@ const handleNewItem = (link) => {
 // }
 
 // main()
-//findNewItems()
+findNewItems()
 
 cron.schedule('02 09 * * 1-5', () => {
   findNewItems()
