@@ -23,6 +23,16 @@ function sleep(ms) {
   });
 }
 
+const hashtagList = ["#stocks","#trading","#finance","#insidertrading","#assets","#wallstreetbets","#wallstreet","#wealth","#generationalWealth"]
+const hashtagGenerator = ()=>{
+    var arr = [];
+    while(arr.length < 2){
+        var r = Math.floor(Math.random() * hashtagList.length - 1) + 1;
+        if(arr.indexOf(r) === -1) arr.push(r);
+    }
+    return `${hashtagList[arr[0]]} ${hashtagList[arr[1]]}`
+}
+
 const addAllItems = async() => {
   getFilings().then(async(res) => {
     for(let i=0;i<res.length;i++){
@@ -62,7 +72,8 @@ const handleNewItem = (link) => {
     await downloadDisclosures(link)
     const filerName = await getFilerName()
     if(await hasStockReport()){
-      let tweet = `Senator ${filerName} has filed a new stock trade \n\nSource: ${link} \n\n#${filerName.replaceAll(' ','').replace(".","")} #stocks #trading`
+      let hashTags = hashtagGenerator()
+      let tweet = `Senator ${filerName} has filed a new stock trade \n\nSource: ${link} \n\n#${filerName.replaceAll(' ','').replace(".","")} ${hashTags}`
       await convertPDFtoPNG() //converts the most recent report to an image to be uploaded by twitter
       sendTweet(tweet)
       console.log(tweet)
