@@ -83,4 +83,5 @@ cron.schedule('02 09 * * 1-5', () => {
   findNewItems()
 }, {
   scheduled: true,
+  timezone: "America/New_York"
 });
